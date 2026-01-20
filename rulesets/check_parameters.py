@@ -31,7 +31,7 @@ from cmk.rulesets.v1.form_specs import (
     migrate_to_integer_simple_levels,
     SimpleLevels,
 )
-from cmk.rulesets.v1.rule_specs import CheckParameters, Topic, HostCondition
+from cmk.rulesets.v1.rule_specs import CheckParameters, Topic, HostCondition, HostAndItemCondition
 
 
 def _parameter_form_phion_firewall():
@@ -108,3 +108,41 @@ rule_spec_phion_vpnusers = CheckParameters(
     title=Title('Phion/Barracuda VPN Users'),
     condition=HostCondition(),
 )
+
+def _parameter_form_phion_hwsensors():
+    return Dictionary(
+        elements={
+            "temp": DictElement(
+                parameter_form=SimpleLevels(
+                    title=Title("Levels for temperature (upper)"),
+                    level_direction=LevelDirection.UPPER,
+                    form_spec_template=Integer(unit_symbol="°C"),
+                    migrate=migrate_to_integer_simple_levels,
+                    prefill_levels_type=DefaultValue(LevelsType.NONE),
+                    prefill_fixed_levels=InputHint(value=(0, 0)),
+                ),
+                required=False,
+            ),
+            "fan": DictElement(
+                parameter_form=SimpleLevels(
+                    title=Title("Levels for fan speed (lower)"),
+                    level_direction=LevelDirection.LOWER,
+                    form_spec_template=Integer(unit_symbol="rpm"),
+                    migrate=migrate_to_integer_simple_levels,
+                    prefill_levels_type=DefaultValue(LevelsType.NONE),
+                    prefill_fixed_levels=InputHint(value=(0, 0)),
+                ),
+                required=False,
+            ),
+        }
+    )
+
+
+rule_spec_phion_hwsensors = CheckParameters(
+    name="phion_hwsensors",
+    topic=Topic.NETWORKING,
+    parameter_form=_parameter_form_phion_hwsensors,
+    title=Title("Phion/Barracuda Hardware Sensors"),
+    condition=HostAndItemCondition(item_title=Title("Hardware sensor")),
+)
+

@@ -21,6 +21,7 @@ from cmk.graphing.v1 import (
     metrics,
     perfometers,
     translations,
+    graphs,
 )
 
 
@@ -39,6 +40,15 @@ translation_phion_vpnusers = translations.Translation(
     check_commands=[translations.PassiveCheck('phion_vpnusers')],
     translations={
         'users': translations.RenameTo('phion_vpnusers'),
+    }
+)
+
+translation_phion_hwsensors = translations.Translation(
+    name='phion_hwsensors',
+    check_commands=[translations.PassiveCheck('phion_hwsensors')],
+    translations={
+        'temp': translations.RenameTo('temp'),
+        'fan_rpm': translations.RenameTo('fan_rpm'),
     }
 )
 
@@ -70,6 +80,20 @@ metric_veeam_phion_firewall_packets = metrics.Metric(
     color=metrics.Color.GREEN,
 )
 
+metric_phion_hwsensors_temp = metrics.Metric(
+    name='temp',
+    title=metrics.Title('Temperature'),
+    unit=metrics.Unit(metrics.DecimalNotation('°C'), metrics.StrictPrecision(1)),
+    color=metrics.Color.ORANGE,
+)
+
+metric_phion_hwsensors_fan_rpm = metrics.Metric(
+    name='fan_rpm',
+    title=metrics.Title('Fan speed'),
+    unit=metrics.Unit(metrics.DecimalNotation('rpm'), metrics.StrictPrecision(0)),
+    color=metrics.Color.BLUE,
+)
+
 perfometer_phion_vpnusers = perfometers.Perfometer(
     name='phion_vpnusers',
     focus_range=perfometers.FocusRange(perfometers.Closed(0), perfometers.Open(10)),
@@ -89,3 +113,31 @@ perfometer_phion_firewall = perfometers.Stacked(
         segments=['phion_firewall_traffic'],
     ),
 )
+
+perfometer_phion_hwsensors_temp = perfometers.Perfometer(
+    name='phion_hwsensors_temp',
+    focus_range=perfometers.FocusRange(perfometers.Closed(0), perfometers.Open(100)),
+    segments=['temp'],
+)
+
+perfometer_phion_hwsensors_fan = perfometers.Perfometer(
+    name='phion_hwsensors_fan',
+    focus_range=perfometers.FocusRange(perfometers.Closed(0), perfometers.Open(10000)),
+    segments=['fan_rpm'],
+)
+
+metric_phion_hwsensors_psu_state = metrics.Metric(
+    name="psu_state",
+    title=metrics.Title("PSU state"),
+    unit=metrics.Unit(metrics.DecimalNotation(""), metrics.StrictPrecision(0)),
+    color=metrics.Color.PURPLE,
+)
+
+graph_phion_hwsensors_psu_state = graphs.Graph(
+    name="phion_hwsensors_psu_state",
+    title=metrics.Title("PSU state"),
+    simple_lines=[
+        graphs.Line(metric_name="psu_state"),
+    ],
+)
+
