@@ -11,6 +11,7 @@ Checks based on the Phion-MIB for the Barracuda CloudGen Firewall.
  * phion_firewall - Checks the number of firewall sessions and the data / packet Throughput.
  * phion_service - Checks the status of the services.
  * phion_vpnusers - Checks the number of concurrent VPN users.
+ * phion_hwsensors - Checks PSU, temperatures and fans.
 
 ## Development
 
