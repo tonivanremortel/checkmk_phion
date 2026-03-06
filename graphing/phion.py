@@ -141,3 +141,17 @@ graph_phion_hwsensors_psu_state = graphs.Graph(
     ],
 )
 
+metric_phion_vpn_state = metrics.Metric(
+    name="vpn_state",
+    title=metrics.Title("VPN tunnel state"),
+    unit=metrics.Unit(metrics.DecimalNotation(""), metrics.StrictPrecision(0)),
+    color=metrics.Color.BLUE,
+)
+
+graph_phion_vpn_state = graphs.Graph(
+    name="phion_vpn_state",
+    title=metrics.Title("VPN tunnel state"),
+    simple_lines=[
+        graphs.Line(metric_name="vpn_state"),
+    ],
+)
