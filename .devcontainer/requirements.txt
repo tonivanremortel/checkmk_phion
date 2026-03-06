@@ -1,6 +1,0 @@
-flake8
-pytest
-pytest-cov
-pytest-md
-pytest-emoji
-requests-mock
