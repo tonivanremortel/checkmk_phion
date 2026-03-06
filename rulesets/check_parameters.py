@@ -146,3 +146,25 @@ rule_spec_phion_hwsensors = CheckParameters(
     condition=HostAndItemCondition(item_title=Title("Hardware sensor")),
 )
 
+def _parameter_form_phion_vpntunnels():
+    return Dictionary(
+        elements={
+            "min_active": DictElement(
+                parameter_form=Integer(
+                    title=Title("Minimum number of active transports"),
+                    unit_symbol="transport(s)",
+                    prefill=DefaultValue(1),
+                ),
+                required=False,
+            ),
+        }
+    )
+
+
+rule_spec_phion_vpntunnels = CheckParameters(
+    name="phion_vpntunnels",
+    topic=Topic.NETWORKING,
+    parameter_form=_parameter_form_phion_vpntunnels,
+    title=Title("Phion/Barracuda VPN tunnels"),
+    condition=HostAndItemCondition(item_title=Title("VPN tunnel")),
+)

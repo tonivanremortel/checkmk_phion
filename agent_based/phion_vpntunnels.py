@@ -20,30 +20,33 @@ VPN_STATE_TEXT = {
 
 
 def is_site_to_site_tunnel(name: str) -> bool:
-    if name.startswith("FW2FW-"):
-        return True
-    if name.startswith("IPSEC-"):
-        return True
-    return False
+    return name.startswith("FW2FW-") or name.startswith("IPSEC-")
 
 
 def base_tunnel_name(name: str) -> str:
     """
-    FW2FW tunnels have transport suffixes like :0, :8, :9 and must be bundled.
-    IPSEC tunnels in your walk do not, so keep them as-is.
+    Normalize tunnel names so transports are bundled under one service.
     """
     if name.startswith("FW2FW-") and ":" in name:
         return name.rsplit(":", 1)[0]
+
+    if name.startswith("IPSEC-") and "_" in name:
+        return name.split("_", 1)[0]
+
     return name
 
 
 def transport_name(name: str) -> str:
     """
-    Return transport suffix for FW2FW, otherwise 'default' for single-entry IPSEC tunnels.
+    Return the transport identifier inside a bundled tunnel.
     """
     if name.startswith("FW2FW-") and ":" in name:
         return name.rsplit(":", 1)[1]
-    return "default"
+
+    if name.startswith("IPSEC-") and "_" in name:
+        return name.split("_", 1)[1]
+
+    return "__base__"
 
 
 def parse_phion_vpntunnels(string_table):
@@ -51,8 +54,13 @@ def parse_phion_vpntunnels(string_table):
     Rows: [vpnName, vpnState]
 
     Group transports by base tunnel name.
+
+    For IPSEC tunnels, the short base object and the child transport objects
+    are grouped together. If child transports exist, the base object
+    '__base__' is ignored for health evaluation.
     """
     grouped = {}  # base_name -> {"states": {transport: state}}
+
     for row in string_table:
         if len(row) < 2:
             continue
@@ -83,17 +91,25 @@ def discovery_phion_vpntunnels(section):
 
 
 def check_phion_vpntunnels(item, params, section):
+    required_active = int(params.get("min_active", 1))
+
     if item not in section:
         return
 
-    states = section[item]["states"]
+    all_states = dict(section[item]["states"])
+
+    # If real child transports exist, ignore the synthetic/base IPSEC object
+    # for health evaluation.
+    effective_states = dict(all_states)
+    if "__base__" in effective_states and len(effective_states) > 1:
+        del effective_states["__base__"]
 
     active = []
     warnish = []
     down = []
     unknown = []
 
-    for transport, st in sorted(states.items(), key=lambda x: x[0]):
+    for transport, st in sorted(effective_states.items(), key=lambda x: x[0]):
         if st == 1:
             active.append(transport)
         elif st == 0:
@@ -103,11 +119,10 @@ def check_phion_vpntunnels(item, params, section):
         else:
             unknown.append((transport, st))
 
-    total = len(states)
+    total = len(effective_states)
     active_count = len(active)
     warn_count = len(warnish)
     down_count = len(down)
-    unknown_count = len(unknown)
 
     yield Metric("vpn_transport_active", active_count)
     yield Metric("vpn_transport_total", total)
@@ -127,13 +142,33 @@ def check_phion_vpntunnels(item, params, section):
 
     details_text = "; ".join(details)
 
-    if active_count == total and total > 0:
+    # No usable transport left after filtering
+    if total == 0:
+        yield Result(
+            state=State.UNKNOWN,
+            summary=f"{item}: no usable transport state found",
+            details="raw states: " + ", ".join(
+                f"{k}={v}" for k, v in sorted(all_states.items())
+            ),
+        )
+        return
+
+    if active_count < required_active:
+        yield Result(
+            state=State.CRIT,
+            summary=(
+                f"{item}: {active_count}/{total} transport(s) active, "
+                f"minimum required is {required_active}"
+            ),
+            details=details_text,
+        )
+    elif active_count == total:
         yield Result(
             state=State.OK,
             summary=f"{item}: all {total} transport(s) active",
             details=details_text,
         )
-    elif active_count > 0:
+    else:
         yield Result(
             state=State.WARN,
             summary=(
@@ -142,26 +177,14 @@ def check_phion_vpntunnels(item, params, section):
             ),
             details=details_text,
         )
-    elif (warn_count + down_count) > 0:
-        yield Result(
-            state=State.CRIT,
-            summary=f"{item}: all {total} transport(s) down",
-            details=details_text,
-        )
-    else:
-        yield Result(
-            state=State.UNKNOWN,
-            summary=f"{item}: unable to determine tunnel state",
-            details=details_text,
-        )
-
 
 check_plugin_phion_vpntunnels = CheckPlugin(
     name="phion_vpntunnels",
     service_name="VPN Tunnel %s",
     discovery_function=discovery_phion_vpntunnels,
     check_function=check_phion_vpntunnels,
-    check_default_parameters={},
+    check_default_parameters={"min_active": 1},
+    check_ruleset_name="phion_vpntunnels",
 )
 
 
