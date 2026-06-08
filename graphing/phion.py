@@ -31,7 +31,7 @@ translation_phion_firewall = translations.Translation(
     translations={
         'sessions': translations.RenameTo('phion_firewall_sessions'),
         'traffic': translations.RenameTo('phion_firewall_traffic'),
-        'packets': translations.RenameTo('phion_firewall_packets'),
+        'packages': translations.RenameTo('phion_firewall_packets'),
     }
 )
 
@@ -141,17 +141,33 @@ graph_phion_hwsensors_psu_state = graphs.Graph(
     ],
 )
 
-metric_phion_vpn_state = metrics.Metric(
-    name="vpn_state",
-    title=metrics.Title("VPN tunnel state"),
+metric_phion_vpn_transport_active = metrics.Metric(
+    name="vpn_transport_active",
+    title=metrics.Title("Active transports"),
     unit=metrics.Unit(metrics.DecimalNotation(""), metrics.StrictPrecision(0)),
-    color=metrics.Color.BLUE,
+    color=metrics.Color.GREEN,
 )
 
-graph_phion_vpn_state = graphs.Graph(
-    name="phion_vpn_state",
-    title=metrics.Title("VPN tunnel state"),
+metric_phion_vpn_transport_down = metrics.Metric(
+    name="vpn_transport_down",
+    title=metrics.Title("Down transports"),
+    unit=metrics.Unit(metrics.DecimalNotation(""), metrics.StrictPrecision(0)),
+    color=metrics.Color.RED,
+)
+
+metric_phion_vpn_transport_total = metrics.Metric(
+    name="vpn_transport_total",
+    title=metrics.Title("Total transports"),
+    unit=metrics.Unit(metrics.DecimalNotation(""), metrics.StrictPrecision(0)),
+    color=metrics.Color.GRAY,
+)
+
+graph_phion_vpntunnels = graphs.Graph(
+    name="phion_vpntunnels",
+    title=metrics.Title("VPN tunnel transports"),
     simple_lines=[
-        graphs.Line(metric_name="vpn_state"),
+        graphs.Line(metric_name="vpn_transport_active"),
+        graphs.Line(metric_name="vpn_transport_down"),
+        graphs.Line(metric_name="vpn_transport_total"),
     ],
 )
