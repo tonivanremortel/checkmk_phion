@@ -2,3 +2,4 @@
 .coverage
 __pycache__
 debug.log
+build_mkp.py

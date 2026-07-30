@@ -137,7 +137,7 @@ graph_phion_hwsensors_psu_state = graphs.Graph(
     name="phion_hwsensors_psu_state",
     title=metrics.Title("PSU state"),
     simple_lines=[
-        graphs.Line(metric_name="psu_state"),
+        "psu_state",
     ],
 )
 
@@ -166,8 +166,8 @@ graph_phion_vpntunnels = graphs.Graph(
     name="phion_vpntunnels",
     title=metrics.Title("VPN tunnel transports"),
     simple_lines=[
-        graphs.Line(metric_name="vpn_transport_active"),
-        graphs.Line(metric_name="vpn_transport_down"),
-        graphs.Line(metric_name="vpn_transport_total"),
+        "vpn_transport_active",
+        "vpn_transport_down",
+        "vpn_transport_total",
     ],
 )
