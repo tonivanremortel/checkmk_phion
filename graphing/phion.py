@@ -80,13 +80,6 @@ metric_veeam_phion_firewall_packets = metrics.Metric(
     color=metrics.Color.GREEN,
 )
 
-metric_phion_hwsensors_temp = metrics.Metric(
-    name='temp',
-    title=metrics.Title('Temperature'),
-    unit=metrics.Unit(metrics.DecimalNotation('°C'), metrics.StrictPrecision(1)),
-    color=metrics.Color.ORANGE,
-)
-
 metric_phion_hwsensors_fan_rpm = metrics.Metric(
     name='fan_rpm',
     title=metrics.Title('Fan speed'),
