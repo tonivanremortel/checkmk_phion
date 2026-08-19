@@ -63,7 +63,7 @@ def _parameter_form_phion_firewall():
                 parameter_form=SimpleLevels(
                     title=Title('Levels for traffic'),
                     level_direction=LevelDirection.UPPER,
-                    form_spec_template=DataSize(displayed_magnitudes=IECMagnitude),
+                    form_spec_template=DataSize(displayed_magnitudes=list(IECMagnitude)),
                     migrate=migrate_to_integer_simple_levels,
                     prefill_levels_type=DefaultValue(LevelsType.NONE),
                     prefill_fixed_levels=InputHint(value=(0, 0)),
