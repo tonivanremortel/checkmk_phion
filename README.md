@@ -11,5 +11,3 @@ Checks based on the Phion-MIB for the Barracuda CloudGen Firewall.
  * phion_vpnusers - Checks the number of concurrent VPN users.
  * phion_vpntunnels - Checks the status of site to site VPN tunnels (TINA and IPSec).
  * phion_hwsensors - Checks PSU, temperatures and fans.
-
-
