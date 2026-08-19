@@ -1,0 +1,15 @@
+title: Barracuda CloudGen Firewall: Sessions and Throughput
+agents: snmp
+catalog: app/barracuda
+license: GPLv2
+distribution: phion
+description:
+ This check monitors the overall load of a Barracuda CloudGen Firewall
+ using the Phion-MIB. It reports the number of concurrent sessions, the
+ packet throughput and the data throughput of the firewall.
+
+ Upper levels can be configured for all three values via the ruleset
+ "Phion/Barracuda Firewall".
+
+discovery:
+ One service named {Firewall} is created per device.

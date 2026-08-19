@@ -149,11 +149,14 @@ rule_spec_phion_hwsensors = CheckParameters(
 def _parameter_form_phion_vpntunnels():
     return Dictionary(
         elements={
-            "min_active": DictElement(
-                parameter_form=Integer(
-                    title=Title("Minimum number of active transports"),
-                    unit_symbol="transport(s)",
-                    prefill=DefaultValue(1),
+            "levels_active": DictElement(
+                parameter_form=SimpleLevels(
+                    title=Title("Levels for number of active transports"),
+                    level_direction=LevelDirection.LOWER,
+                    form_spec_template=Integer(unit_symbol="transport(s)"),
+                    migrate=migrate_to_integer_simple_levels,
+                    prefill_levels_type=DefaultValue(LevelsType.NONE),
+                    prefill_fixed_levels=InputHint(value=(2, 1)),
                 ),
                 required=False,
             ),

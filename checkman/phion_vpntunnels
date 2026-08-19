@@ -1,0 +1,28 @@
+title: Barracuda CloudGen Firewall: VPN Tunnels
+agents: snmp
+catalog: app/barracuda
+license: GPLv2
+distribution: phion
+description:
+ This check monitors site-to-site VPN tunnels ({FW2FW} and {IPSEC}) of a
+ Barracuda CloudGen Firewall, as reported by the Phion-MIB vpnTunnels
+ table.
+
+ Tunnels that consist of multiple redundant transports (paths) are
+ bundled into a single service. For each transport the state {active},
+ {down-disabled} or {down} is evaluated; unrecognised states are reported
+ as {unknown}.
+
+ Levels for the number of active transports can be configured via the
+ ruleset "Phion/Barracuda VPN tunnels". If no levels are configured, the
+ service goes {CRIT} when no transport is active, and {WARN} when at
+ least one but not all transports are active.
+
+item:
+ The name of the tunnel, or of the tunnel bundle for tunnels with
+ multiple redundant transports, as reported by the device.
+
+discovery:
+ One service is created for each site-to-site VPN tunnel or tunnel bundle
+ reported by the device. Tunnels that are not site-to-site
+ ({FW2FW}/{IPSEC}) are ignored.

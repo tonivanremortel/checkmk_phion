@@ -1,0 +1,16 @@
+title: Barracuda CloudGen Firewall: Service Status
+agents: snmp
+catalog: app/barracuda
+license: GPLv2
+distribution: phion
+description:
+ This check monitors the status of the individual server services running
+ on a Barracuda CloudGen Firewall, as reported by the Phion-MIB. The
+ service is {OK} while up, and {CRIT} otherwise ({down}, {block}, {wild}
+ or {removed}).
+
+item:
+ The name of the service as reported by the device.
+
+discovery:
+ One service is created for each service reported by the device.

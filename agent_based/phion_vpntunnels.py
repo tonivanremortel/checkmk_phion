@@ -91,8 +91,6 @@ def discovery_phion_vpntunnels(section):
 
 
 def check_phion_vpntunnels(item, params, section):
-    required_active = int(params.get("min_active", 1))
-
     if item not in section:
         return
 
@@ -153,22 +151,26 @@ def check_phion_vpntunnels(item, params, section):
         )
         return
 
-    if active_count < required_active:
+    levels_type, levels_values = params.get("levels_active") or ("no_levels", None)
+
+    if levels_type == "fixed":
+        warn_threshold, crit_threshold = levels_values
+    else:
+        # No explicit levels configured: fall back to the legacy default of
+        # requiring at least one active transport, warning on any transport
+        # that is not active.
+        warn_threshold, crit_threshold = total, 1
+
+    if active_count < crit_threshold:
         yield Result(
             state=State.CRIT,
             summary=(
                 f"{item}: {active_count}/{total} transport(s) active, "
-                f"minimum required is {required_active}"
+                f"minimum required is {crit_threshold}"
             ),
             details=details_text,
         )
-    elif active_count == total:
-        yield Result(
-            state=State.OK,
-            summary=f"{item}: all {total} transport(s) active",
-            details=details_text,
-        )
-    else:
+    elif active_count < warn_threshold:
         yield Result(
             state=State.WARN,
             summary=(
@@ -177,13 +179,21 @@ def check_phion_vpntunnels(item, params, section):
             ),
             details=details_text,
         )
+    else:
+        yield Result(
+            state=State.OK,
+            summary=f"{item}: all {total} transport(s) active"
+            if active_count == total
+            else f"{item}: {active_count}/{total} transport(s) active",
+            details=details_text,
+        )
 
 check_plugin_phion_vpntunnels = CheckPlugin(
     name="phion_vpntunnels",
     service_name="VPN Tunnel %s",
     discovery_function=discovery_phion_vpntunnels,
     check_function=check_phion_vpntunnels,
-    check_default_parameters={"min_active": 1},
+    check_default_parameters={"levels_active": ("no_levels", None)},
     check_ruleset_name="phion_vpntunnels",
 )
 

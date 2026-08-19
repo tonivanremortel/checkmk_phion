@@ -1,0 +1,29 @@
+title: Barracuda CloudGen Firewall: Hardware Sensors
+agents: snmp
+catalog: hw/environment/barracuda
+license: GPLv2
+distribution: phion
+description:
+ This check monitors the hardware sensors of a Barracuda CloudGen Firewall
+ appliance, as reported by the Phion-MIB hwSensors table. Depending on the
+ sensor type it reports:
+
+ {Temperature} sensors, in degrees Celsius.
+
+ {Fan} sensors, in RPM.
+
+ {PSU} sensors, as their reported status. The {OK}/{WARN}/{CRIT} mapping
+ is derived from values observed on live devices, since the vendor does
+ not document them.
+
+ {Voltage} sensors are reported for information only, without an
+ associated check result.
+
+ Levels for the temperature (upper) and fan speed (lower) can be
+ configured via the ruleset "Phion/Barracuda Hardware Sensors".
+
+item:
+ The name of the hardware sensor as reported by the device.
+
+discovery:
+ One service is created for each hardware sensor reported by the device.

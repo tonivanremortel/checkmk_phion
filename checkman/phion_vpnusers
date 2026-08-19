@@ -1,0 +1,15 @@
+title: Barracuda CloudGen Firewall: VPN Users
+agents: snmp
+catalog: app/barracuda
+license: GPLv2
+distribution: phion
+description:
+ This check monitors the number of concurrently connected client-to-site
+ VPN users on a Barracuda CloudGen Firewall, as reported by the
+ Phion-MIB.
+
+ Upper levels can be configured via the ruleset "Phion/Barracuda VPN
+ Users".
+
+discovery:
+ One service named {VPN Users} is created per device.
